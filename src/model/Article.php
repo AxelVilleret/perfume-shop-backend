@@ -1,6 +1,6 @@
 
 <?php
-require_once('src/lib/database.php');
+require_once('src/lib/Database.php');
 require_once('src/model/Stock.php');
 class Article {
     public int $id_article;

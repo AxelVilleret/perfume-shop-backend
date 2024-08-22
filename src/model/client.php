@@ -1,9 +1,10 @@
 <?php
 
-require_once('src/lib/database.php');
-require_once('src/model/commande.php');
+require_once('src/model/Repository.php');
+require_once('src/lib/Database.php');
+require_once('src/model/Commande.php');
 require_once('src/model/Membership.php');
-require_once('src/model/solde_de_points.php');
+require_once('src/model/SoldePoints.php');
 
 class Client  
 {
@@ -17,16 +18,9 @@ class Client
     public int $id_membership;
 }
 
-class ClientRepository
+class ClientRepository extends Repository
 {
-    private DatabaseConnection $connection;
-
-    public function __construct()
-    {
-        $this->connection = new DatabaseConnection();
-    }
-
-    public function getClients(): array
+    public function getAlll(): array
     {
         $statement = $this->connection->getConnection()->query(
             "SELECT * FROM client ORDER BY id_client"
@@ -47,16 +41,13 @@ class ClientRepository
         return $clients;
     }
 
-    public function addClient( string $nom, string $adresse, string $email, string $telephone, string $facebook, string $instagram):bool {
-        #creer un nouveau client
+    public function addu(string $nom, string $adresse, string $email, string $telephone, string $facebook, string $instagram): bool {
         $statement1 = $this->connection->getConnection()->prepare(
             "INSERT INTO client (nom, adresse, email, telephone, facebook, instagram, id_membership) VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
-        #initialiser le nombre de point pour chaque clients avec id_solde	nombre_points	date_expiration	
         $statement2 = $this->connection->getConnection()->prepare(
             "INSERT INTO solde_de_points (nombre_points, date_expiration) VALUES (?, ?)"
         );
-        #lier le client avec son solde de points
         $statement3 = $this->connection->getConnection()->prepare(
             "INSERT INTO client_solde (id_client, id_solde) VALUES (?, ?)"
         );
@@ -74,6 +65,22 @@ class ClientRepository
         }
         return false;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function deleteClient(int $id_client):bool {
         $statement1 = $this->connection->getConnection()->prepare(

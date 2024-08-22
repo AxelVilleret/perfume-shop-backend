@@ -1,6 +1,6 @@
 <?php
 
-require_once('src/lib/database.php');
+require_once('src/lib/Database.php');
 require_once('src/model/Facture.php');
 require_once('src/model/Paiement.php');
 require_once('src/model/Article.php');
