@@ -1,4 +1,3 @@
-<!-- id_stock	statut_article	quantite_produit	id_article	 -->
 <?php
 class Stock
 {

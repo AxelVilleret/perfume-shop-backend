@@ -19,7 +19,12 @@ class Client
 
 class ClientRepository
 {
-    public DatabaseConnection $connection;
+    private DatabaseConnection $connection;
+
+    public function __construct()
+    {
+        $this->connection = new DatabaseConnection();
+    }
 
     public function getClients(): array
     {
