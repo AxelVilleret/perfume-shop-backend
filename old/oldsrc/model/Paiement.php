@@ -2,7 +2,7 @@
 
 class Paiement
 {
-    public int $id_paiement;
+    public int $id;
     public float $montant;
     public string $date_paiement;
     public string $type;

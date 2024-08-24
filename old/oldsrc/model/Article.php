@@ -3,7 +3,7 @@
 require_once('src/lib/Database.php');
 require_once('src/model/Stock.php');
 class Article {
-    public int $id_article;
+    public int $id;
     public string $nom_article;
     public float $prix_commande;
     public float $prix_magasin;
@@ -14,26 +14,6 @@ class Article {
 class ArticleRepository
 {
     public DatabaseConnection $connection;
-    
-    //getArticle
-    public function getArticles(): array
-    {
-        $statement = $this->connection->getConnection()->prepare(
-            "SELECT * FROM article ORDER BY id_article"
-        );
-        $articles = [];
-        $statement->execute();
-        while (($row = $statement->fetch())){
-            $article = new Article();
-            $article->id_article = $row['id_article'];
-            $article->nom_article = $row['nom_article'];
-            $article->prix_commande = $row['prix_commande'];
-            $article->prix_magasin = $row['prix_magasin'];
-            $article->prix_vip = $row['prix_vip'];
-            $articles[] = $article;
-        }
-        return $articles;
-    }
 
     //addArticle
     public function addArticle(string $nom_article, float $prix_commande, float $prix_magasin, float $prix_vip, string $statut_article, int $quantite_produit): bool
@@ -107,22 +87,6 @@ class ArticleRepository
             }
         }
         return false;
-    }
-    //getArticleById
-    public function getArticleById(int $id_article): Article
-    {
-        $statement = $this->connection->getConnection()->prepare(
-            "SELECT * FROM article WHERE id_article = ?"
-        );
-        $statement->execute([$id_article]);
-        $row = $statement->fetch();
-        $article = new Article();
-        $article->id_article = $row['id_article'];
-        $article->nom_article = $row['nom_article'];
-        $article->prix_commande = $row['prix_commande'];
-        $article->prix_magasin = $row['prix_magasin'];
-        $article->prix_vip = $row['prix_vip'];
-        return $article;
     }
 
     public function getIdArticleByName(string $nom_article): int

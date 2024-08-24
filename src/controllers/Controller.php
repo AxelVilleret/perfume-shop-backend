@@ -1,29 +1,32 @@
 <?php
 
-require_once('src/model/Repository.php');
-
 abstract class Controller
 {
     protected Repository $repository;
+
+    public function __construct(Repository $repository)
+    {
+        $this->repository = $repository;
+    }
     
-    public function execute($get, $post, $method)
+    public function execute($query, $instance, $method)
     {
         switch ($method) {
             case 'GET':
-                if (isset($get['id'])) {
-                    $this->getById($get['id']);
+                if (isset($query['id'])) {
+                    $this->getById($query['id']);
                 } else {
                     $this->getAll();
                 }
                 break;
             case 'POST':
-                $this->add($post);
+                $this->add($instance);
                 break;
             case 'PUT':
-                $this->update($post);
+                $this->update($instance);
                 break;
             case 'DELETE':
-                $this->delete($get['id']);
+                $this->delete($query['id']);
                 break;
             default:
                 throw new Exception("Invalid request method.");
@@ -42,9 +45,9 @@ abstract class Controller
         echo json_encode($object);
     }
 
-    protected function add($post)
+    protected function add($instance)
     {
-        $res = $this->repository->add($post);
+        $res = $this->repository->add($instance);
         if($res){
             echo json_encode(['message' => 'Object added successfully']);
         }else{
@@ -52,9 +55,9 @@ abstract class Controller
         }
     }
 
-    protected function update($post)
+    protected function update($instance)
     {
-        $res = $this->repository->update($post);
+        $res = $this->repository->update($instance);
         if($res){
             echo json_encode(['message' => 'Object updated successfully']);
         }else{
