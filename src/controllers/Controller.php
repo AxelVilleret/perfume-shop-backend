@@ -1,5 +1,7 @@
 <?php
 
+require_once 'src/lib/Response.php';
+
 abstract class Controller
 {
     protected Repository $repository;
@@ -14,7 +16,10 @@ abstract class Controller
         switch ($method) {
             case 'GET':
                 if (isset($query['id'])) {
-                    $this->getById($query['id']);
+                    if (filter_var($query['id'], FILTER_VALIDATE_INT) !== false)
+                        $this->getById($query['id']);
+                    else
+                        throw new Exception("Invalid id parameter.");
                 } else {
                     $this->getAll();
                 }
@@ -26,7 +31,14 @@ abstract class Controller
                 $this->update($instance);
                 break;
             case 'DELETE':
-                $this->delete($query['id']);
+                if (isset($query['id'])) {
+                    if (filter_var($query['id'], FILTER_VALIDATE_INT) !== false)
+                        $this->delete($query['id']);
+                    else
+                        throw new Exception("Invalid id parameter.");
+                } else {
+                    throw new Exception("Missing id parameter.");
+                }
                 break;
             default:
                 throw new Exception("Invalid request method.");
@@ -36,42 +48,34 @@ abstract class Controller
     protected function getAll()
     {
         $objects = $this->repository->getAll();
-        echo json_encode($objects);
+        Response::sendSuccess('Objects retrieved successfully', $objects, 200);
     }
 
     protected function getById($id)
     {
         $object = $this->repository->getById($id);
-        echo json_encode($object);
+        Response::sendSuccess('Object retrieved successfully', $object, 200);
     }
 
     protected function add($instance)
     {
-        $res = $this->repository->add($instance);
-        if($res){
-            echo json_encode(['message' => 'Object added successfully']);
-        }else{
-            echo json_encode(['message' => 'Error adding object']);
-        }
+        $object = $this->repository->add($instance);
+        Response::sendSuccess('Object added successfully', $object, 201);
     }
 
     protected function update($instance)
     {
-        $res = $this->repository->update($instance);
-        if($res){
-            echo json_encode(['message' => 'Object updated successfully']);
-        }else{
-            echo json_encode(['message' => 'Error updating object']);
-        }
+        $object = $this->repository->update($instance);
+        Response::sendSuccess('Object updated successfully', $object, 200);
     }
 
     protected function delete($id)
     {
         $res = $this->repository->delete($id);
         if($res){
-            echo json_encode(['message' => 'Object deleted successfully']);
+            Response::sendSuccess('Object deleted successfully', [], 204);
         }else{
-            echo json_encode(['message' => 'Error deleting object']);
+            Response::sendError('Error deleting object', 400);
         }
     }
 

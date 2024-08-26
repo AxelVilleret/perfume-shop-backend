@@ -1,5 +1,7 @@
 <?php
 
+require_once 'src/lib/Response.php';
+
 class Router
 {
     public function routeRequest()
@@ -24,8 +26,11 @@ class Router
                 if (file_exists($controllerFile) && file_exists($repositoryFile) && file_exists($entityFile)) {
                     require_once $controllerFile;
                     $controller = new $controllerName(new $repositoryName());
-                    $instance = new $entity($body);
-
+                    if ($method === 'POST' || $method === 'PUT') {
+                        $instance = new $entity($body);
+                    } else {
+                        $instance = null;
+                    }
                     // Check if the method exists in the controller
                     if (method_exists($controller, 'execute')) {
                         $controller->execute($_GET, $instance, $method);
@@ -39,15 +44,7 @@ class Router
                 throw new Exception("The endpoint is not valid.");
             }
         } catch (Exception $e) {
-            $errorMessage = $e->getMessage();
-            $response = [
-                'status' => 'error',
-                'message' => $errorMessage
-            ];
-            header('Content-Type: application/json');
-            http_response_code(500);
-            echo json_encode($response);
-            exit;
+            Response::sendError($e->getMessage());
         }
 
     }

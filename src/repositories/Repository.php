@@ -33,11 +33,14 @@ abstract class Repository
             "SELECT * FROM " . $entity . " WHERE id = " . $id
         );
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
+        if (!$row) {
+            throw new Exception("Object not found.");
+        }
         $instance = new $entity($row);
         return $instance;
     }
 
-    public function add(Entity $instance): bool
+    public function add(Entity $instance): Entity
     {
         $entity = $this->getClassPrefix();
         $fields = '';
@@ -51,12 +54,17 @@ abstract class Repository
         $statement = $this->connection->getConnection()->prepare(
             "INSERT INTO " . $entity . " (" . $fields . ") VALUES (" . $values . ")"
         );
-        return $statement->execute();
+        $statement->execute();
+        $instance->id = $this->connection->getConnection()->lastInsertId();
+        return $instance;
     }
 
-    public function update(Entity $instance): bool
+    public function update(Entity $instance): Entity
     {
         $entity = $this->getClassPrefix();
+        if (!isset($instance->id)) {
+            throw new Exception("Missing id parameter.");
+        }
         $fields = '';
         foreach ($instance as $key => $value) {
             $fields .= $key . " = '" . $value . "', ";
@@ -65,17 +73,31 @@ abstract class Repository
         $statement = $this->connection->getConnection()->prepare(
             "UPDATE " . $entity . " SET " . $fields . " WHERE id = " . $instance->id
         );
-        return $statement->execute();
+        $statement->execute();
+        return $instance;
     }
 
     public function delete(int $id): bool
     {
         $entity = $this->getClassPrefix();
-        $statement = $this->connection->getConnection()->prepare(
-            "DELETE FROM " . $entity . " WHERE id = " . $id
+        $checkStatement = $this->connection->getConnection()->prepare(
+            "SELECT COUNT(*) FROM " . $entity . " WHERE id = :id"
         );
-        return $statement->execute();
+        $checkStatement->bindParam(':id', $id, PDO::PARAM_INT);
+        $checkStatement->execute();
+        $exists = $checkStatement->fetchColumn();
+
+        if ($exists) {
+            $statement = $this->connection->getConnection()->prepare(
+                "DELETE FROM " . $entity . " WHERE id = :id"
+            );
+            $statement->bindParam(':id', $id, PDO::PARAM_INT);
+            return $statement->execute();
+        } else {
+            return false;
+        }
     }
+
 
     private function getClassPrefix(): string
     {

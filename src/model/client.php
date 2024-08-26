@@ -10,5 +10,7 @@ class Client extends Entity
     public string $telephone;
     public string $facebook;
     public string $instagram;
-    public int $id_membership;
+    public int $id_membership = 1;
+    protected array $requiredFields = ['nom', 'adresse', 'email', 'telephone'];
+    
 }
