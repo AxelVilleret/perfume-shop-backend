@@ -1,15 +1,28 @@
 <?php
 
 require_once 'src/lib/DatabaseConnection.php';
+require_once 'src/repositories/IRepository.php';
 
-abstract class Repository 
+abstract class Repository implements IRepository
 {
 
-    protected DatabaseConnection $connection;
+    private DatabaseConnection $connection;
 
     public function __construct()
     {
         $this->connection = new DatabaseConnection();
+    }
+
+
+    private function isExisting(int $id): bool
+    {
+        $entity = $this->getClassPrefix();
+        $statement = $this->connection->getConnection()->prepare(
+            "SELECT COUNT(*) FROM " . $entity . " WHERE id = :id"
+        );
+        $statement->bindParam(':id', $id, PDO::PARAM_INT);
+        $statement->execute();
+        return $statement->fetchColumn();
     }
 
     public function getAll(): array
@@ -54,7 +67,10 @@ abstract class Repository
         $statement = $this->connection->getConnection()->prepare(
             "INSERT INTO " . $entity . " (" . $fields . ") VALUES (" . $values . ")"
         );
-        $statement->execute();
+        $res = $statement->execute();
+        if (!$res) {
+            throw new Exception("Error inserting object.");
+        }
         $instance->id = $this->connection->getConnection()->lastInsertId();
         return $instance;
     }
@@ -65,6 +81,9 @@ abstract class Repository
         if (!isset($instance->id)) {
             throw new Exception("Missing id parameter.");
         }
+        if (!$this->isExisting($instance->id)) {
+            throw new Exception("Object not found.");
+        }
         $fields = '';
         foreach ($instance as $key => $value) {
             $fields .= $key . " = '" . $value . "', ";
@@ -73,20 +92,17 @@ abstract class Repository
         $statement = $this->connection->getConnection()->prepare(
             "UPDATE " . $entity . " SET " . $fields . " WHERE id = " . $instance->id
         );
-        $statement->execute();
+        $res = $statement->execute();
+        if (!$res) {
+            throw new Exception("Error updating object.");
+        }
         return $instance;
     }
 
     public function delete(int $id): bool
     {
         $entity = $this->getClassPrefix();
-        $checkStatement = $this->connection->getConnection()->prepare(
-            "SELECT COUNT(*) FROM " . $entity . " WHERE id = :id"
-        );
-        $checkStatement->bindParam(':id', $id, PDO::PARAM_INT);
-        $checkStatement->execute();
-        $exists = $checkStatement->fetchColumn();
-
+        $exists = $this->isExisting($id);
         if ($exists) {
             $statement = $this->connection->getConnection()->prepare(
                 "DELETE FROM " . $entity . " WHERE id = :id"

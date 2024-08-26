@@ -7,7 +7,6 @@ class Router
     public function routeRequest()
     {
         try {
-            // Parse the URL path
             $urlPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
             $urlSegments = explode('/', trim($urlPath, '/'));
             $body = json_decode(file_get_contents('php://input'), true) ?: [];
@@ -31,12 +30,7 @@ class Router
                     } else {
                         $instance = null;
                     }
-                    // Check if the method exists in the controller
-                    if (method_exists($controller, 'execute')) {
-                        $controller->execute($_GET, $instance, $method);
-                    } else {
-                        throw new Exception("Method execute not found in $controllerName.");
-                    }
+                    $controller->execute($_GET, $instance, $method);
                 } else {
                     throw new Exception("The endpoint is not valid.");
                 }

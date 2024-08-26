@@ -1,6 +1,6 @@
 <?php
 
-class Entity
+abstract class Entity
 {
     public int $id;
     protected array $requiredFields = [];

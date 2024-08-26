@@ -2,7 +2,7 @@
 
 class DatabaseConnection
 {
-    public ?\PDO $database = null;
+    private ?\PDO $database = null;
 
     public function getConnection(): \PDO
     {

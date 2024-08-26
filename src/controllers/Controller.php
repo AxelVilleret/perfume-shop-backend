@@ -4,9 +4,9 @@ require_once 'src/lib/Response.php';
 
 abstract class Controller
 {
-    protected Repository $repository;
+    private IRepository $repository;
 
-    public function __construct(Repository $repository)
+    public function __construct(IRepository $repository)
     {
         $this->repository = $repository;
     }
