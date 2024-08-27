@@ -21,7 +21,7 @@ class ControllerTest extends TestCase
         $this->expectOutputString(json_encode([
             'status' => 'success',
             'message' => 'Objects retrieved successfully',
-            'data' => ['object1', 'object2']
+            'body' => ['object1', 'object2']
         ]));
 
         $this->controller->execute([], null, 'GET');
@@ -33,7 +33,7 @@ class ControllerTest extends TestCase
         $this->expectOutputString(json_encode([
             'status' => 'success',
             'message' => 'Object retrieved successfully',
-            'data' => 'object1'
+            'body' => 'object1'
         ]));
 
         $this->controller->execute(['id' => 1], null, 'GET');
@@ -46,7 +46,7 @@ class ControllerTest extends TestCase
         $this->expectOutputString(json_encode([
             'status' => 'success',
             'message' => 'Object added successfully',
-            'data' => $instance
+            'body' => $instance
         ]));
 
         $this->controller->execute([], $instance, 'POST');
@@ -59,7 +59,7 @@ class ControllerTest extends TestCase
         $this->expectOutputString(json_encode([
             'status' => 'success',
             'message' => 'Object updated successfully',
-            'data' => $instance
+            'body' => $instance
         ]));
 
         $this->controller->execute([], $instance, 'PUT');
@@ -67,11 +67,9 @@ class ControllerTest extends TestCase
 
     public function testDelete()
     {
-        $this->repository->method('delete')->willReturn(true);
         $this->expectOutputString(json_encode([
             'status' => 'success',
             'message' => 'Object deleted successfully',
-            'data' => []
         ]));
 
         $this->controller->execute(['id' => 1], null, 'DELETE');

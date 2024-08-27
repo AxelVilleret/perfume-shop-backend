@@ -1,17 +1,17 @@
 <?php
 
 class Response {
-    public static function sendError($errorMessage, $statusCode = 500) {
+    public static function error($errorMessage, $statusCode = 500) {
         $response = [
             'status' => 'error',
             'message' => $errorMessage
         ];
         header('Content-Type: application/json');
         http_response_code($statusCode);
-        echo json_encode($response);
+        return json_encode($response);
     }
 
-    public static function sendSuccess($message, $body = [], $statusCode = 200) {
+    public static function success($message, $body = [], $statusCode = 200) {
         $response = [
             'status' => 'success',
             'message' => $message,
@@ -21,6 +21,6 @@ class Response {
         }
         header('Content-Type: application/json');
         http_response_code($statusCode);
-        echo json_encode($response);
+        return json_encode($response);
     }
 }

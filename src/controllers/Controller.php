@@ -17,23 +17,23 @@ abstract class Controller
             case 'GET':
                 if (isset($query['id'])) {
                     if (filter_var($query['id'], FILTER_VALIDATE_INT) !== false)
-                        $this->getById($query['id']);
+                        return $this->getById($query['id']);
                     else
                         throw new Exception("Invalid id parameter.");
                 } else {
-                    $this->getAll();
+                    return $this->getAll();
                 }
                 break;
             case 'POST':
-                $this->add($instance);
+                return $this->add($instance);
                 break;
             case 'PUT':
-                $this->update($instance);
+                return $this->update($instance);
                 break;
             case 'DELETE':
                 if (isset($query['id'])) {
                     if (filter_var($query['id'], FILTER_VALIDATE_INT) !== false)
-                        $this->delete($query['id']);
+                        return $this->delete($query['id']);
                     else
                         throw new Exception("Invalid id parameter.");
                 } else {
@@ -48,35 +48,31 @@ abstract class Controller
     protected function getAll()
     {
         $objects = $this->repository->getAll();
-        Response::sendSuccess('Objects retrieved successfully', $objects, 200);
+        return Response::success('Objects retrieved successfully', $objects, 200);
     }
 
     protected function getById($id)
     {
         $object = $this->repository->getById($id);
-        Response::sendSuccess('Object retrieved successfully', $object, 200);
+        return Response::success('Object retrieved successfully', $object, 200);
     }
 
     protected function add($instance)
     {
         $object = $this->repository->add($instance);
-        Response::sendSuccess('Object added successfully', $object, 201);
+        return Response::success('Object added successfully', $object, 201);
     }
 
     protected function update($instance)
     {
         $object = $this->repository->update($instance);
-        Response::sendSuccess('Object updated successfully', $object, 200);
+        return Response::success('Object updated successfully', $object, 200);
     }
 
     protected function delete($id)
     {
-        $res = $this->repository->delete($id);
-        if($res){
-            Response::sendSuccess('Object deleted successfully', [], 204);
-        }else{
-            Response::sendError('Error deleting object', 400);
-        }
+        $this->repository->delete($id);
+        return Response::success('Object deleted successfully', null, 200);
     }
 
 }

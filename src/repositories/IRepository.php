@@ -6,5 +6,5 @@ interface IRepository
     public function getById(int $id): Entity;
     public function add(Entity $instance): Entity;
     public function update(Entity $instance): Entity;
-    public function delete(int $id): bool;
+    public function delete(int $id): void;
 }

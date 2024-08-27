@@ -99,7 +99,7 @@ abstract class Repository implements IRepository
         return $instance;
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id): void
     {
         $entity = $this->getClassPrefix();
         $exists = $this->isExisting($id);
@@ -108,9 +108,9 @@ abstract class Repository implements IRepository
                 "DELETE FROM " . $entity . " WHERE id = :id"
             );
             $statement->bindParam(':id', $id, PDO::PARAM_INT);
-            return $statement->execute();
+            $statement->execute();
         } else {
-            return false;
+            throw new Exception("Object not found.");
         }
     }
 
