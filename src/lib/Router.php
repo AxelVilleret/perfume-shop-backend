@@ -9,6 +9,9 @@ class Router
         try {
             $urlPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
             $urlSegments = explode('/', trim($urlPath, '/'));
+            if (empty($urlSegments[1])) {
+                throw new Exception("The endpoint is not valid.");
+            }
             
             $body = json_decode(file_get_contents('php://input'), true) ?: [];
             $method = $_SERVER['REQUEST_METHOD'];
@@ -16,6 +19,9 @@ class Router
             switch ($urlSegments[1]) {
                 case 'uc':
                     $useCase = !empty($urlSegments[2]) ? ucfirst($urlSegments[2]) : null;
+                    if (!$useCase) {
+                        throw new Exception("The endpoint is not valid.");
+                    }
                     $controllerName = $useCase . 'Controller';
                     $controllerFile = 'src/controllers/' . $controllerName . '.php';
                     if (file_exists($controllerFile)) {

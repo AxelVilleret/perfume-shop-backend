@@ -30,8 +30,10 @@ class DownloadCommandesService implements IService
 
     private function writeCsv($commandes)
     {
+        if (count($commandes) === 0) {
+            throw new Exception('No data to export');
+        }
         $fp = fopen($this->file, 'w');
-
         foreach ($commandes as $commande) {
             $commandeArray = $this->objectToArray($commande, ['requiredFields']);
             if (fputcsv($fp, $commandeArray) === false) {

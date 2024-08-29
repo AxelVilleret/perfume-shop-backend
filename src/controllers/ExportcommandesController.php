@@ -1,22 +1,15 @@
 <?php
 
-require_once('src/model/Commande.php');
-require_once('src/repositories/CommandeRepository.php');
-require_once('src/services/ShowCommandesService.php');
-require_once('src/services/DownloadCommandesService.php');
-require_once('src/uc/ExportCommandes.php');
+require_once('src/uc/ExportCommandesUC.php');
 require_once('src/controllers/Controller.php');
 
 class ExportcommandesController extends Controller
 {
-    private IUseCase $exportCommandes;
+    private ExportCommandesUC $exportCommandes;
 
     public function __construct()
     {
-        $commandeRepository = new CommandeRepository();
-        $showCommandesService = new ShowCommandesService($commandeRepository);
-        $downloadCommandesService = new DownloadCommandesService($showCommandesService);
-        $this->exportCommandes = new ExportCommandes($downloadCommandesService);
+        $this->exportCommandes = new ExportCommandesUC();
     }
 
     public function execute($query, $instance, $method)
@@ -24,6 +17,12 @@ class ExportcommandesController extends Controller
         if ($method !== 'GET') {
             throw new Exception("Invalid request method.");
         }  
-        $this->exportCommandes->execute();  
+        if (!isset($query['id'])) {
+            throw new Exception("Missing id parameter.");
+        }
+        if (filter_var($query['id'], FILTER_VALIDATE_INT) === false) {
+            throw new Exception("Invalid id parameter.");
+        }
+        $this->exportCommandes->execute($query['id']);  
     }
 }
