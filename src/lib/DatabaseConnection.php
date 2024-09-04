@@ -7,7 +7,7 @@ class DatabaseConnection
     public function getConnection(): \PDO
     {
         if ($this->database === null) {
-            $this->database = new \PDO('mysql:host=localhost;dbname=conciergerie;charset=utf8', 'root', '');
+            $this->database = new \PDO('mysql:host=localhost;dbname=perfume-shop;charset=utf8', 'root', '');
         }
 
         return $this->database;
