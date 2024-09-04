@@ -9,16 +9,16 @@ class Router
         try {
             $urlPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
             $urlSegments = explode('/', trim($urlPath, '/'));
-            if (empty($urlSegments[1])) {
+            if (empty($urlSegments[0])) {
                 throw new Exception("The endpoint is not valid.");
             }
             
             $body = json_decode(file_get_contents('php://input'), true) ?: [];
             $method = $_SERVER['REQUEST_METHOD'];
 
-            switch ($urlSegments[1]) {
+            switch ($urlSegments[0]) {
                 case 'uc':
-                    $useCase = !empty($urlSegments[2]) ? ucfirst($urlSegments[2]) : null;
+                    $useCase = !empty($urlSegments[1]) ? ucfirst($urlSegments[1]) : null;
                     if (!$useCase) {
                         throw new Exception("The endpoint is not valid.");
                     }
@@ -34,7 +34,7 @@ class Router
 
                     break;
                 default:
-                    $entity = !empty($urlSegments[1]) ? ucfirst($urlSegments[1]) : null;
+                    $entity = !empty($urlSegments[0]) ? ucfirst($urlSegments[0]) : null;
 
                     if ($entity) {
                         $controllerName = $entity . 'Controller';
@@ -53,9 +53,11 @@ class Router
                             }
                             echo $controller->execute($_GET, $instance, $method);
                         } else {
+                            echo 'ici';
                             throw new Exception("The endpoint is not valid.");
                         }
                     } else {
+                        echo 'la';
                         throw new Exception("The endpoint is not valid.");
                     }
                     break;
