@@ -5,14 +5,12 @@ require_once 'src/repositories/IRepository.php';
 
 abstract class Repository implements IRepository
 {
-
     private DatabaseConnection $connection;
 
     public function __construct()
     {
         $this->connection = new DatabaseConnection();
     }
-
 
     private function isExisting(int $id): bool
     {
@@ -47,7 +45,7 @@ abstract class Repository implements IRepository
         );
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
         if (!$row) {
-            throw new Exception("Object not found.");
+            throw new Exception(ERROR_INVALID_ID);
         }
         $instance = new $entity($row);
         return $instance;
@@ -69,7 +67,7 @@ abstract class Repository implements IRepository
         );
         $res = $statement->execute();
         if (!$res) {
-            throw new Exception("Error inserting object.");
+            throw new Exception(ERROR_INVALID_METHOD);
         }
         $instance->id = $this->connection->getConnection()->lastInsertId();
         return $instance;
@@ -79,10 +77,10 @@ abstract class Repository implements IRepository
     {
         $entity = $this->getClassPrefix();
         if (!isset($instance->id)) {
-            throw new Exception("Missing id parameter.");
+            throw new Exception(ERROR_MISSING_ID);
         }
         if (!$this->isExisting($instance->id)) {
-            throw new Exception("Object not found.");
+            throw new Exception(ERROR_INVALID_ID);
         }
         $fields = '';
         foreach ($instance as $key => $value) {
@@ -94,7 +92,7 @@ abstract class Repository implements IRepository
         );
         $res = $statement->execute();
         if (!$res) {
-            throw new Exception("Error updating object.");
+            throw new Exception(ERROR_INVALID_METHOD);
         }
         return $instance;
     }
@@ -110,10 +108,9 @@ abstract class Repository implements IRepository
             $statement->bindParam(':id', $id, PDO::PARAM_INT);
             $statement->execute();
         } else {
-            throw new Exception("Object not found.");
+            throw new Exception(ERROR_INVALID_ID);
         }
     }
-
 
     private function getClassPrefix(): string
     {
@@ -124,5 +121,4 @@ abstract class Repository implements IRepository
         }
         return '';
     }
-
 }
