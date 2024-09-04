@@ -53,11 +53,9 @@ class Router
                             }
                             echo $controller->execute($_GET, $instance, $method);
                         } else {
-                            echo 'ici';
                             throw new Exception("The endpoint is not valid.");
                         }
                     } else {
-                        echo 'la';
                         throw new Exception("The endpoint is not valid.");
                     }
                     break;
